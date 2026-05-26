@@ -1,12 +1,20 @@
 name: data-sync
 
 on:
+
   workflow_dispatch:
 
+  schedule:
+    - cron: "0 * * * *"
+
+
 jobs:
-  scrape:
+
+  sync:
 
     runs-on: ubuntu-latest
+
+    timeout-minutes: 55
 
     permissions:
       contents: write
@@ -27,18 +35,23 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run scraper
+      - name: Pull latest data
+        run: |
+          git pull origin main || true
+
+      - name: Run sync
         run: |
           python data-sync.py
 
-      - name: Commit CSV
+      - name: Sync cache
         run: |
 
           git config --global user.name "github-actions"
+
           git config --global user.email "github-actions@github.com"
 
           git add .
 
-          git commit -m "update csv" || echo "nothing to commit"
+          git commit -m "sync cache" || echo "nothing to commit"
 
           git push
