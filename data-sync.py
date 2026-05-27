@@ -35,6 +35,10 @@ CSV_FILE = "nicegram_dump.csv"
 
 QUEUE_FILE = "queue.json"
 
+VISITED_FILE = "visited.json"
+
+CURSORS_FILE = "cursors.json"
+
 
 users = set()
 
@@ -113,6 +117,75 @@ def save_queue():
     ) as f:
 
         json.dump(queue, f)
+
+
+def load_state():
+
+    global visited_pages
+    global visited_cursors
+
+    try:
+
+        with open(
+            VISITED_FILE,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            visited_pages = set(json.load(f))
+
+        print(f"LOADED VISITED: {len(visited_pages)}")
+
+    except:
+
+        visited_pages = set()
+
+        print("NO VISITED FILE")
+
+    try:
+
+        with open(
+            CURSORS_FILE,
+            "r",
+            encoding="utf-8"
+        ) as f:
+
+            visited_cursors = set(json.load(f))
+
+        print(f"LOADED CURSORS: {len(visited_cursors)}")
+
+    except:
+
+        visited_cursors = set()
+
+        print("NO CURSORS FILE")
+
+
+def save_state():
+
+    with open(
+        VISITED_FILE,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        json.dump(
+            list(visited_pages),
+            f
+        )
+
+    with open(
+        CURSORS_FILE,
+        "w",
+        encoding="utf-8"
+    ) as f:
+
+        json.dump(
+            list(visited_cursors),
+            f
+        )
+
+    print("STATE SAVED")
 
 
 def save_users():
@@ -240,6 +313,8 @@ load_existing_users()
 
 load_queue()
 
+load_state()
+
 
 while queue:
 
@@ -296,6 +371,8 @@ while queue:
 
         save_queue()
 
+        save_state()
+
 
     sleep_time = random.uniform(3, 6)
 
@@ -307,6 +384,8 @@ while queue:
 save_users()
 
 save_queue()
+
+save_state()
 
 print("\nRUN FINISHED")
 
